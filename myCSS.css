@@ -1,0 +1,103 @@
+@media only screen and (max-width: 500px) {
+
+ #sidebar-wrapper
+ {
+ z-index:1;
+position: absolute;
+width: 70px !important; 
+height: 100%;
+overflow-y:hidden;
+background-color: black;
+border-radius: 5px;
+transition: 0.5s;
+ }
+ #page-content-wrapper{
+padding-left:70px !important; 
+}
+
+#wrapper.menuDisplayed #sidebar-wrapper
+{
+width: 0px !important; 
+transition: 0.5s;
+}
+
+#wrapper.menuDisplayed #page-content-wrapper
+{
+padding-left:10px !important;
+transition: 0.5s;
+}
+}
+
+
+ #dropdown_select
+ {
+ opacity: 0.5;
+ }
+ #OptionId
+ {
+ opacity: 0.5;
+ }
+ 
+.navbar-collapse
+{
+z-index:1;
+position: absolute;
+width: 250px;
+height: 100%;
+overflow-y:hidden;
+background-color: black;
+border-radius: 5px;
+transition: 0.5s;
+
+}
+#sidebar-wrapper
+{
+z-index:1;
+position: absolute;
+width: 250px;
+height: 100%;
+overflow-y:hidden;
+background-color: black;
+border-radius: 5px;
+transition: 0.5s;
+}
+
+#page-content-wrapper{
+width: 100%;
+position: absolute;
+padding: 15px;
+border: 5px soid grey;
+padding-left:250px;
+transition: 0.5s;
+}
+
+#wrapper.menuDisplayed #sidebar-wrapper
+{
+width: 0px;
+transition: 0.5s;
+}
+
+#wrapper.menuDisplayed #page-content-wrapper
+{
+padding-left:10px;
+transition: 0.5s;
+}
+
+.sidebar-nav{
+padding: 0;
+list-style:none;
+}
+
+.sidebar-nav li{ 
+text-indent: 20px;
+line-height: 40px;
+}
+
+.sidebar-nav li a{
+display: block;
+text-decoration: none;
+color: white;
+}
+.pag{
+text-align:center;
+}

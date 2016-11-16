@@ -1,0 +1,467 @@
+<html ng-app = "myApp">
+    
+<head>
+	<link rel="stylesheet" href = "myCSS.css">
+	<title>Congress</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>  
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.6/ngStorage.min.js"></script>	
+	<script src = "jquery-3.1.1.min.js"></script>
+	<script src = "dirPagination.js"></script>
+    <script src = "angjs8.js"></script>
+</head>
+<body ng-controller = "myCtrl">
+	<div id = "wrapper">
+		<div class = "container-fluid">
+			<div class = "row">
+				<div class = "col-lg-4 col-xs-4">
+					<a href = "#" id = "menu-toggle"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
+				</div>
+				<div class = "col-lg-8 col-xs-8">
+					<h5><span><a href="http://104.198.0.197:8080" target = "_blank"><img src = "logo.png"></img></a></span><span>Congress API</span></h5>
+				</div>
+			</div>
+		</div>	
+		
+		<!--Sidebar-->
+		<div id = "sidebar-wrapper">
+			<ul class = "sidebar-nav">
+				<li><a id = "leg" ng-click = "btnlegislator()" href = "#"><span class="glyphicon glyphicon-user"></span><span class = "hidden-xs"> Legislators</span></a></li>
+				<li><a id = "bil" ng-click = "btnBill()" href = "#"><span class="glyphicon glyphicon-file"></span><span class = "hidden-xs"> Bills</span></a></li>
+				<li><a id = "com" ng-click = "btnCommittee()" href = "#"><span class="glyphicon glyphicon-log-in"></span><span class = "hidden-xs"> Committees</span></a></li>
+				<li><a id = "fav" ng-click = "btnFavorites()" href = "#"><span class="glyphicon glyphicon-star-empty"></span><span class = "hidden-xs"> Favorites</span></a></li>
+			</ul>
+		</div>
+		<!--Page Content-->
+		<div id = "page-content-wrapper" class = "well">
+			<h3 ng-bind="heading" ng-model = "heading"></h3>
+			<hr>
+			<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+				<div class = "container-fluid">
+					<div class="carousel-inner" role="listbox">
+						<div class="item active">
+							<div class = "row" style = "overflow:scroll">
+								<div class = "col-lg-12 col-xs-12">
+							<!-- Default panel contents -->
+							<!-- Table -->
+									<div style = "padding: 10px; background-color:white;">
+										<div role = "tabpanel">
+										<ul class="nav nav-tabs">
+											<li  ng-repeat = "p in panels" class = {{p.curr}}><a ng-click = "btnPanel(p)" href="#" data-toggle="tab">{{p.Ptxt}}</a></li>
+										</ul>									
+											<div class="panel panel-default">
+												<div class="panel-heading">
+													<div class = "row">
+														<div class "col-lg-4 col-xs-4"><div id = "panel-heading1"><h4>{{headingBy}}</h4></div></div>
+														<div class = "col-lg-4 col-xs-4"></div>
+														<div class = "col-lg-4col-xs-4">
+															<div id = "panel-heading2">
+																<div class="dropdown" style = "float:right">																	
+																	<select ng-change = "searchDropDown(searchModel)" ng-model = "searchModel" id = "dropdown_select" ng-show = "state.dropdown_select">
+																		<option ng-repeat = "st in states">{{st}}</option>
+																	</select>
+																</div>
+																<input id = "searchTabId" type = "text" placeholder = "Search" ng-model = "searchTab" ng-show = "state.searchTabId" style = "float:right"/>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div id = "legislator" ng-show = "state.legislator">
+													<table class="table table-hover">
+														<thead>
+															<th>Party</th>
+															<th>Name</th>
+															<th>Chamber</th>
+															<th>District</th>
+															<th>State</th>
+															<th></th>
+														</thead>
+														<tbody>
+															<tr dir-paginate = "x in namesL | filter: srch1 | filter:searchTab | filter: searchDrop | orderBy : [orderByS,orderByL] | itemsPerPage : 10">
+																<td><img ng-src = "{{ x.party == 'R' ? 'r.png' : 'd.png'}}" style = "width: 15px; height: 15px;"></img></td>
+																<td>{{x.last_name+','+x.first_name}}</td>
+																<td><span><img ng-src = "{{x.chamber == 'house' ? 'h.png' : 's.svg'}}" style = "width: 15px; height: 15px;"></img></span><span> {{x.chamber}}</span></td>
+																<td><span>{{x.district == null ? '' : 'District'}} </span><span>{{x.district == null ? 'N.A' : x.district}}</span></td>
+																<td>{{x.state_name == null ? 'N.A' : x.state_name}}</td>
+																<td ng-click = "btnDetLegislator(x)"><a href = "#myCarousel" role = "button" data-slide = "next" class = "btn btn-primary btn-sm active" style = "text-decoration:none">View Details</a></td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												<div id = "bills" ng-show = "state.bills">
+													<table class="table table-hover">
+														<thead>
+															<tr>
+																<th>Bill ID</th>
+																<th>Bill Type</th>
+																<th>Title</th>
+																<th>Chamber</th>
+																<th>Introduced on</th>
+																<th>Sponsor</th>
+																<th></th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr dir-paginate = "x in namesB | filter:searchTab | orderBy: orderByDate :true | itemsPerPage: 10">
+																<td>{{x.bill_id}}</td>
+																<td>{{x.bill_type}}</td>
+																<td>{{x.official_title}}</td>
+																<td><span><img ng-src = "{{x.chamber == 'house' ? 'h.png' : 's.svg'}}" style = "width: 15px; height: 15px;"></img></span><span> {{x.chamber}}</span></td>
+																<td>{{x.introduced_on}}</td>
+																<td>{{x.sponsor.title+' '+x.sponsor.last_name+' '+x.sponsor.first_name}}</td>
+																<td ng-click = "btnDetBills(x)"><a href = "#myCarousel" role = "button" data-slide = "next"  class = "btn btn-primary btn-sm active" style = "text-decoration:none">View Details</a></td>
+															
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												<div id = "committee" ng-show = "state.committee">
+													<table class="table table-hover">
+														<thead>
+															<tr>
+																<th></th>
+																<th>Chamber</th>
+																<th>Committee ID</th>
+																<th>Name</th>
+																<th id = "ParComId" ng-show = "state.ParComId">Parent Committee</th>
+																<th id = "contactId" ng-show = "state.contactId">Contact</th>
+																<th id = "officeId" ng-show = "state.officeId">Office</th>
+															</tr>
+														</thead>
+														<tbody>
+															<tr dir-paginate = "x in namesC | filter : srch1 | filter:searchTab | orderBy: orderCom |itemsPerPage: 10" ng-init="x.editSave = false">
+																<td>
+																	<span ng-hide="x.editSave"><button class = "glyphicon glyphicon-star-empty" ng-click='btnSaveC(x)'></button></span>
+																	<span ng-show="x.editSave"><button class = "glyphicon glyphicon-star"  ng-click='btnRemoveToggleC(x)'></button></span>
+																</td>
+																
+																<td><span><img ng-src = "{{x.chamber == 'house' ? 'h.png' : 's.svg'}}" style = "width: 15px; height: 15px;"></img></span><span> {{x.chamber}}</span></td>
+																<td>{{x.committee_id}}</td>
+																<td>{{x.name}}</td>
+																<td id = "ParComId" ng-show = "state.ParComId">{{x.parent_committee_id}}</td>
+																<td id = "contactId" ng-show = "state.contactId">{{x.phone}}</td>
+																<td id = "officeId" ng-show = "state.officeId">{{x.office == null ? 'N.A' : x.office}}</td>
+															</tr>
+														</tbody>
+													</table>
+												</div>
+												
+													<table class = "table" id = "favoritesL" ng-show = "state.favoritesL">
+														<thead>
+															<th></th>
+															<th>Image</th>
+															<th>Party</th>
+															<th>Name</th>
+															<th>Chamber</th>
+															<th>State</th>
+															<th>Email</th>
+															<th></th>
+														</thead>
+														<tbody>
+															<tr ng-repeat = "x in namesFL">
+																<td><button ng-click = "btnRemoveL(x)" class = "glyphicon glyphicon-trash"></button></td>
+																
+																<td><img ng-src = "https://theunitedstates.io/images/congress/original/{{x.bioguide_id}}.jpg" style = "width: 30px; height: 30px;" id = "imgDet"></img></td>
+																<td><img ng-src = "{{ x.party == 'R' ? 'r.png' : 'd.png'}}" style = "width: 15px; height: 15px;"></img></td>
+																<td>{{x.last_name+','+x.first_name}}</td>
+																<td><span><img ng-src = "{{x.chamber == 'house' ? 'h.png' : 's.svg'}}" style = "width: 15px; height: 15px;"></img></span><span> {{x.chamber}}</span></td>
+																<td>{{x.state_name}}</td>
+																<td><a href = "mailto:{{namesDet.oc_email}}">{{x.oc_email}}</a></td>
+																<td ng-click = "btnDetLegislator(x)"><a href = "#myCarousel" role = "button" data-slide = "next" class = "btn btn-primary btn-sm active" style = "text-decoration:none">View Details</a></td>
+															</tr>
+														</tbody>
+													</table>
+													<table class = "table"  id = "favoritesB" ng-show = "state.favoritesB">
+														<thead>
+															<th></th>
+															<th>Bill ID</th>
+															<th>Bill Type</th>
+															<th>Title</th>
+															<th>Chamber</th>
+															<th>Introduced On</th>
+															<th>Sponsor</th>
+														</thead>
+														<tbody>
+															<tr ng-repeat = "x in namesFB">
+																<td><button ng-click = "btnRemoveB(x)" class = "glyphicon glyphicon-trash"></button></td>
+																<td>{{x.bill_id}}</td>
+																<td>{{x.bill_type}}</td>
+																<td>{{x.official_title}}</td>
+																<td><span><img ng-src = "{{x.chamber == 'house' ? 'h.png' : 's.svg'}}" style = "width: 15px; height: 15px;"></img></span><span> {{x.chamber}}</span></td>
+																<td>{{x.introduced_on}}</td>
+																<td>{{x.sponsor.title+' '+x.sponsor.last_name+' '+x.sponsor.first_name}}</td>
+																<td ng-click = "btnDetBills(x)"><a href = "#myCarousel" role = "button" data-slide = "next"  class = "btn btn-primary btn-sm active" style = "text-decoration:none">View Details</a></td>
+															</tr>
+														</tbody>
+													</table>
+													<table class = "table"  id = "favoritesC" ng-show = "state.favoritesC">
+														<thead>
+															<th></th>
+															<th>Chamber</th>
+															<th>Committee ID</th>
+															<th>Name</th>
+															<th>Parent Committee</th>
+															<th>Sub Committee</th>
+														</thead>
+														<tbody>
+															<tr ng-repeat = "x in namesFC">
+																<td><button ng-click = "btnRemoveC(x)" class = "glyphicon glyphicon-trash"></button></td>
+																<td><span><img ng-src = "{{x.chamber == 'house' ? 'h.png' : 's.svg'}}" style = "width: 15px; height: 15px;"></img></span><span> {{x.chamber}}</span></td>
+																<td>{{x.committee_id}}</td>
+																<td>{{x.name}}</td>
+																<td>{{x.parent_committee_id}}</td>
+																<td>{{x.subcommittee}}</td>
+															</tr>
+														</tbody>
+													</table>
+												
+				<!--Pagination-->							
+				<dir-pagination-controls
+				max-size = "50"
+				direction-links = "true"
+				boundary-links = "true">
+				</dir-pagination-controls>
+				<!--End of Pagination-->
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="item" style = "background-color:white">
+							<div class = "container-fluid">
+		
+							<!--Legislators View Details -->
+							<div id = "LegDetails" ng-show = "state.LegDetails">
+								<div class = "row"><!--Row 1 begin -->
+									<div class = "col-lg-4 col-xs-4">
+										<a style = "border:1px black solid ;text-decoration: none; display:inline" class = "glyphicon glyphicon-menu-left" href = "#myCarousel" role = "button" data-slide = "prev"></a>
+										<span>Details</span>
+										</hr>
+									</div>
+									<div class = "col-lg-4 col-xs-4"></div>
+									<div class = "col-lg-4 col-xs-6">
+										 <div ng-switch on="selected">
+											<div ng-switch-when='true'><button class = "glyphicon glyphicon-star-empty" ng-click='btnSaveL()'></button></div>
+											<div ng-switch-when='false'><button class = "glyphicon glyphicon-star"  ng-click='btnRemoveToggleL()'></button></div>
+											<div ng-switch-default><button class = "glyphicon glyphicon-star-empty" ng-click='btnSaveL()'></button></div>
+										</div>		
+									</div>
+								</div><!--Row 1 end -->
+								<div class = "row"><!--Row 2 begin-->
+								<div class = "col-lg-6 col-xs-12"><!-- 1st block begins -->
+									<div class = "row"><!--Row 3 begins -->
+										<div  class = "col-lg-6 col-xs-6" style = "text-align: center;">
+											<img ng-src = {{srcImgDetLeg}} style = "width: 150px; height: 180px;" id = "imgDet"></img>
+										</div>
+										<div class = "col-lg-6 col-xs-6">
+											<table class = "table" id = "tab1">
+												<tbody>
+													<tr>   
+														<td>{{namesDet.title+' '+namesDet.last_name+' '+namesDet.first_name}}</td>
+													</tr>
+													<tr>
+														<td><a href = "mailto:{{namesDet.oc_email}}">{{namesDet.oc_email}}</a></td>
+													</tr>
+													<tr>
+														<td>Chamber : {{namesDet.chamber}}</td>
+													</tr>
+													<tr>
+														<td>Contact : <a href = "tel:{{namesDet.phone}}">{{namesDet.phone}}</a></td>
+													</tr>
+													<tr>
+														<td><span><img ng-src = "{{ namesDet.party == 'R' ? 'r.png' : 'd.png'}}" style = "width: 15px; height: 15px;"></img></span><span>{{ namesDet.party == 'R' ? ' Republic' : ' Democrat'}}</span></td>	
+													</tr>
+												</tbody>
+											</table>	
+											</div>
+											</div><!-- Row 3 ends-->
+											<div class = "row"><!-- Row 4 begins-->
+											<div class = "col-lg-12 col-xs-12">
+											<table class = "table">
+												<tbody>
+													<tr>
+														<td>Start Term</td>
+														<td>{{namesDet.term_start | date : "MMM d,yyyy"}}</td>
+													</tr>
+													<tr>
+														<td>End Term</td>
+														<td>{{namesDet.term_end | date : "MMM d,yyyy"}}</td>
+													</tr>
+													<tr>							
+														<td>Term</td>
+														<td>
+															<div class="progress">
+																<div class="progress-bar-success" role="progressbar" aria-valuenow="{{term}}" aria-valuemin="0" aria-valuemax="100" style="width: {{term}}%;">
+																	<span style = "color:white;align :center">{{term}}%</span>
+																</div>
+															</div>
+														</td>
+													</tr>
+													<tr>
+														<td>Office</td>
+														<td>{{namesDet.office}}</td>
+													</tr>
+													<tr>
+														<td>State</td>
+														<td>{{namesDet.state_name}}</td>
+													</tr>
+													<tr>
+														<td>Fax</td>
+														<td><a href = "fax:{{namesDet.fax}}">{{namesDet.fax}}</a></td>
+													</tr>
+													<tr>
+														<td>Birthday</td>
+														<td>{{namesDet.birthday | date : "MMM d,yyyy"}}</td>
+													</tr>
+													<tr>
+														<td>Social Links</td>
+														<td>
+														<span>
+														<a href = {{twt}} target = "_blank"><img src = "t.png" style = "width: 25px; height: 25px;"></img></a>
+														</span>
+														<span>
+														<a href = {{fb}} target = "_blank"><img src = "f.png" style = "width: 25px; height: 25px;"></img></a>
+														</span>
+														<span>
+														<a href = {{namesDet.website}} target = "_blank"><img src = "w.png" style = "width: 25px; height: 25px;"></img></a>
+														</span>
+														</td>
+													</tr>
+											</table>
+											</div>
+										</div><!-- Row 4 ends-->
+										
+									
+								</div><!-- 1st block Ends -->
+								<div class = "col-lg-6 col-xs-6"><!-- 2nd block begins -->
+								<div class = "row"> <!--Row 5 begins-->
+									<div class = "col-lg-12 col-xs-12">
+									<table class = "table">
+										<thead>
+											<tr>
+												<th>Chamber</th>
+												<th>Committee ID</th>
+												<th>Name</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat= "c in comm | limitTo:5">
+												<td>{{c.chamber}}</td>
+												<td>{{c.committee_id}}</td>
+												<td>{{c.name}}</td>
+											</tr>
+										</tbody>
+									</table>
+									</div>
+									</div><!--Row 5 ends-->
+									<div class = "row"> <!--Row 6 begins-->
+									<div class = "col-lg-12 col-xs-12">
+									
+									
+									<table class = "table">
+										<thead>
+											<tr>
+												<th>Bill ID</th>
+												<th>Title</th>
+												<th>Chamber</th>
+												<th>Bill Type</th>
+												<th>Congress</th>
+												<th>Link</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr ng-repeat = "b in bil | limitTo:5">
+												<td>{{b.bill_id}}</td>
+												<td>{{b.official_title}}</td>
+												<td>{{b.chamber}}</td>
+												<td>{{b.bill_type}}</td>
+												<td>{{b.congress}}</td>
+												<td><a href = {{b.last_version.urls.pdf}} target = "_blank">Link</a></td>
+											</tr>
+										</tbody>
+									</table>
+									</div>
+								</div><!-- Row 6 ends-->
+								</div>
+							</div>
+							</div>
+							<!--Legislators View Details Ends-->
+							<!--Bills View Details Begins-->
+							<div id = "BillDetails" ng-show = "state.BillDetails">
+							<div class = "row">
+									<div class = "col-lg-4 col-xs-4">
+										<a style = "border:1px black solid ;text-decoration: none; display:inline" class = "glyphicon glyphicon-menu-left" href = "#myCarousel" role = "button" data-slide = "prev"></a>
+										<span>Details</span>
+										</hr>
+									</div>
+									<div class = "col-lg-4 col-xs-4"></div>
+									<div class = "col-lg-4 col-xs-4">
+										<!--<button class = "glyphicon glyphicon-star-empty" ng-click = "btnSaveB()"></button>-->
+										<div ng-switch on="selected">
+											<div ng-switch-when='true'><button class = "glyphicon glyphicon-star-empty" ng-click='btnSaveB()'></button></div>
+											<div ng-switch-when='false'><button class = "glyphicon glyphicon-star"  ng-click='btnRemoveToggleB()'></button></div>
+											<div ng-switch-default><button class = "glyphicon glyphicon-star-empty" ng-click='btnSaveB()'></button></div>
+										</div>		
+									</div>
+								</div>
+							<div class = "row">
+								<div class = "col-lg-6 col-xs-6">
+									<table class = "table">
+										<tr>
+											<td>Bill Id</td><td>{{namesBillDet.bill_id}}</td>
+										</tr>
+										<tr>
+											<td>Title</td><td>{{namesBillDet.official_title}}</td>
+										</tr>
+										<tr>
+											<td>Bill Type</td><td>{{namesBillDet.bill_type}}</td>
+										</tr>
+										<tr>
+											<td>Sponsor</td><td>{{namesBillDet.sponsor.title+' '+namesBillDet.sponsor.last_name+' '+namesBillDet.sponsor.first_name}}</td>
+										</tr>
+										<tr>
+											<td>Chamber</td><td>{{namesBillDet.chamber}}</td>
+										</tr>
+										<tr>
+											<td>Status</td><td>{{namesBillDet.history.active == false ? 'New Bill' : 'Active Bill'}}</td>
+										</tr>
+										<tr>
+											<td>Introduced on</td><td>{{namesBillDet.introduced_on}}</td>
+										</tr>
+										<tr>
+											<td>Congress URL</td><td><a target = "_blank" href = {{namesBillDet.urls.congress}}>URL</a></td>
+										</tr>
+										<tr>
+											<td>Version Status</td><td>{{namesBillDet.last_version.version_name}}</td>
+										</tr>
+										<tr>
+											<td>Bill URL</td><td><a target = "_blank" href = {{namesBillDet.last_version.urls.pdf}}>Link</a></td>
+										</tr>
+									</table>
+								</div>
+							
+								<div class = "col-lg-6 col-xs-6">
+									<embed ng-src="{{linkPDF}}" width="400" height="600"></embed>
+								</div>
+							</div>
+							</div><!--Bills View Details Ends-->
+							</div> <!-- End container-fluid -->
+						</div><!--item 2 of carousel ends-->
+					</div>
+				</div>
+			</div><!--end of mycarousel -->
+		</div><!--end of page content wrapper-->
+	</div>
+		<script>
+		$("#menu-toggle").click(function(e){
+		e.preventDefault();
+		$("#wrapper").toggleClass("menuDisplayed");
+		});
+		</script>
+</body>
+</html>
